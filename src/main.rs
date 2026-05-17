@@ -1,6 +1,6 @@
-use std::{env, path::PathBuf};
 use anyhow::Result;
 use clap::Parser;
+use std::{env, path::PathBuf};
 
 use crate::{
     cli::{Cli, Commands},

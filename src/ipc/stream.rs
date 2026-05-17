@@ -11,6 +11,7 @@ use crate::ipc::get_socket_path;
 pub struct Stream(UnixStream);
 
 impl Stream {
+    #[allow(unused)]
     pub fn get_client() -> Result<Self> {
         let client = UnixStream::connect(get_socket_path())?;
         let stream = Stream::new(client);
