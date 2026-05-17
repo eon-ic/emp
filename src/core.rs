@@ -1,7 +1,7 @@
 use std::{fs::File, io::BufReader, path::PathBuf, sync::Arc, time::Duration};
 
 use anyhow::Result;
-use lofty::{file::TaggedFileExt, tag::Accessor};
+use lofty::{file::TaggedFileExt, picture::MimeType, tag::Accessor};
 use rodio::{DeviceSinkBuilder, Player, Source, decoder::DecoderBuilder};
 use souvlaki::{MediaControlEvent, MediaControls, MediaMetadata, MediaPosition, PlatformConfig};
 
@@ -61,10 +61,12 @@ impl Core {
         Ok(Response::Success)
     }
     pub fn next(&mut self) -> Result<Response> {
+        *self.playing_time.lock().unwrap() = 0.0;
         self.music_manager.next();
         self.play()
     }
     pub fn previous(&mut self) -> Result<Response> {
+        *self.playing_time.lock().unwrap() = 0.0;
         self.music_manager.previous();
         self.play()
     }
@@ -103,7 +105,15 @@ impl Core {
                     if !pictures.is_empty() {
                         // 这里我们简单地将封面图片保存到临时文件，并使用 file:// URI
                         let picture = &pictures[0];
-                        let temp_path = std::env::temp_dir().join("bmusic-cover.jpg");
+                        let temp_path = std::env::temp_dir().join({
+                            let s = String::from("bmusic-cover.");
+                            let t = match picture.mime_type().unwrap_or(&MimeType::Png) {
+                                MimeType::Jpeg => "jpg",
+                                MimeType::Png => "png",
+                                _ => "png",
+                            };
+                            s + t
+                        });
                         std::fs::write(&temp_path, picture.data())?;
                         cover_url = Some(format!("file://{}", temp_path.to_string_lossy()));
                     }
@@ -154,7 +164,6 @@ impl Core {
             if let Some(duration) = self.total_duration {
                 if duration.as_secs_f64() <= *self.playing_time.lock().unwrap() {
                     self.pause()?;
-                    *self.playing_time.lock().unwrap() = 0.0;
                     self.next()?;
                 }
             }
@@ -169,6 +178,7 @@ impl Core {
         Ok(Response::Success)
     }
     pub fn append_and_play(&mut self, path: PathBuf) -> Result<Response> {
+        *self.playing_time.lock().unwrap() = 0.0;
         self.music_manager.append_and_next(path);
         self.play()
     }
