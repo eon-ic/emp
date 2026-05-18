@@ -1,6 +1,7 @@
-use std::{fs, os::unix::net::UnixListener};
+use std::fs;
 
 use anyhow::Result;
+use tokio::net::UnixListener;
 
 use crate::ipc::{get_socket_path, stream::Stream};
 
@@ -15,11 +16,11 @@ impl Daemon {
             fs::remove_file(&path)?;
         }
         let server = UnixListener::bind(&path)?;
+
         Ok(Self { server })
     }
-    pub fn accept(&mut self) -> Result<Stream> {
-        self.server.set_nonblocking(true).expect("无法设置为非阻塞");
-        let (stream, _) = self.server.accept()?;
+    pub async fn accept(&mut self) -> Result<Stream> {
+        let (stream, _) = self.server.accept().await?;
         Ok(Stream::new(stream))
     }
 }

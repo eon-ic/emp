@@ -1,6 +1,15 @@
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct PlayStatus {
+    pub playing: bool,
+    pub position: u64,
+    pub duration: u64,
+    pub cover: Option<PathBuf>,
+    pub music_name: String,
+    pub artist: String,
+}
 
 pub mod stream;
 #[derive(Serialize, Deserialize, Debug)]
@@ -13,6 +22,7 @@ pub enum Request {
     Append(PathBuf),
     Seek(f64),
     SetVolume(f64),
+    Status,
     Quit,
 }
 
@@ -21,6 +31,7 @@ pub enum Response {
     Pong,
     Success,
     Error(String),
+    Status(PlayStatus),
 }
 
 pub fn get_socket_path() -> PathBuf {

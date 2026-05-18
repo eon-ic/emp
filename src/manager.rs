@@ -21,12 +21,12 @@ impl MusicManager {
         self.next();
         self.musics.insert(self.index as usize, path);
     }
-    pub fn get(&self) -> Result<PathBuf> {
-        Ok(PathBuf::from(
-            self.musics
-                .get(self.index as usize)
-                .context("无法找到Music")?,
-        ))
+    pub fn get_path(&self) -> Result<PathBuf> {
+        let a = self
+            .musics
+            .get(self.index as usize)
+            .context("无法找到Music")?;
+        Ok(a.clone())
     }
     pub fn next(&mut self) {
         if self.index + 1 >= self.musics.len() as i32 {
