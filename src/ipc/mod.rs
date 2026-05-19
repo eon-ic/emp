@@ -15,8 +15,8 @@ pub mod stream;
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Request {
     Ping,
-    Play(Option<PathBuf>),
     Pause,
+    Play(Option<PathBuf>),
     Next,
     Previous,
     Append(PathBuf),
@@ -33,11 +33,13 @@ pub enum Response {
     Error(String),
     Status(PlayStatus),
 }
-
-pub fn get_socket_path() -> PathBuf {
-    if let Ok(runtime_dir) = std::env::var("XDG_RUNTIME_DIR") {
-        PathBuf::from(runtime_dir).join("piri.sock")
-    } else {
-        PathBuf::from("/tmp/piri.sock")
-    }
+pub fn get_addr() -> &'static str {
+    "127.0.0.1:6600"
 }
+// pub fn get_socket_path() -> PathBuf {
+//     if let Ok(runtime_dir) = std::env::var("XDG_RUNTIME_DIR") {
+//         PathBuf::from(runtime_dir).join("piri.sock")
+//     } else {
+//         PathBuf::from("/tmp/piri.sock")
+//     }
+// }
