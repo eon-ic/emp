@@ -14,8 +14,7 @@ use crate::{
     ipc::{Request, Response, stream::Stream},
 };
 
-#[tokio::main]
-async fn main() -> Result<()> {
+fn main() -> Result<()> {
     let cli = Cli::parse();
     match cli.command {
         Commands::Daemon => {
